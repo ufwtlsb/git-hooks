@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+
 	"github.com/blang/semver"
 	"github.com/google/go-github/github"
 	"github.com/mitchellh/go-homedir"
@@ -384,7 +385,25 @@ func runConfigHooks(configs map[string]string, contrib string, current string, a
 // Execute specific hook with arguments
 // Return error message as out if error occured
 func runHook(hook string, args ...string) (status int, err error) {
-	cmd := exec.Command(hook, args...)
+	var cmd *exec.Cmd
+	// Will run a shell script with sh.exe include in Git for Windows
+	if runtime.GOOS == "windows" {
+		//windows 可以执行sh的
+		// sh是mingw的，会自动判断hook是否可以执行
+		// 所以用exec
+		windowsCmd := "sh"
+		//fmt.Println("windowsCmd is", windowsCmd)
+		//Z:\work\worklog\202005\tmp\test-git-hook-1\githooks\pre-commit\test.sh replace，in git for windows
+		hook = strings.ReplaceAll(hook, "\\", "/")
+		cmdArgs := []string{"-c", "exec " + hook}
+		//fmt.Println("cmdArgs is", cmdArgs)
+		windowsArgs := append(cmdArgs, args...)
+		//fmt.Println("windowsArgs is", windowsArgs)
+		cmd = exec.Command(windowsCmd, windowsArgs...)
+	} else {
+		cmd = exec.Command(hook, args...)
+	}
+
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
