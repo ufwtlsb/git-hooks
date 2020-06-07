@@ -4,7 +4,6 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
-	"github.com/urfave/cli"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -12,7 +11,10 @@ import (
 	"os/exec"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"strings"
+
+	"github.com/urfave/cli"
 )
 
 func getGitRepoRoot() (string, error) {
@@ -189,5 +191,58 @@ func absExePath(exe string) (name string, err error) {
 }
 
 func isExecutable(info os.FileInfo) bool {
+	if runtime.GOOS == "windows" {
+		//windows 全部成功，因为取不到fullpath
+		return true
+		// 支持git for windows
+		//参考git for windows的实现
+		// if strings.HasSuffix(info.Name(), ".exe") {
+		// 	return true
+		// }
+		// // a := info.(*os.fileStat)
+		// // fmt.Println("fileStat is", a)
+		// //windows下取到全path
+		// // 用反射 os.fileStat
+		// getType := reflect.TypeOf(info)
+		// if getType.Kind() == reflect.Ptr {
+		// 	getType = getType.Elem()
+		// }
+		// _, exist := getType.FieldByName("path")
+		// if !exist {
+		// 	//如果得不到path，就认为可以执行
+		// 	return true
+		// }
+		// getValue := reflect.ValueOf(info).Elem()
+		// //sf.Get()
+		// //value := sf.Interface()
+		// for i := 0; i < getType.NumField(); i++ {
+		// 	field := getType.Field(i)
+		// 	fmt.Printf("%s: %v =xxxv\n", field.Name, field.Type)
+		// 	if field.Name == "path" {
+		// 		value := getValue.Field(i).Interface()
+		// 		fmt.Printf(" %v\n", value)
+		// 	}
+
+		// }
+
+		// f, err := os.Open(info.Name())
+		// if err != nil {
+		// 	return false
+		// }
+		// sheBangHeader := make([]byte, 2)
+		// n1, err := f.Read(sheBangHeader)
+		// if err != nil {
+		// 	return false
+		// }
+		// if n1 != 2 {
+		// 	return false
+		// }
+		// sheBang := string(sheBangHeader[:n1])
+		// fmt.Println("sheBang is", sheBang)
+		// if sheBang == "#!" {
+		// 	return true
+		// }
+		// return false
+	}
 	return info.Mode()&0111 != 0
 }
