@@ -195,7 +195,7 @@ func installGlobal(home string) {
 	isExist, _ := exists(homeTemplate)
 	if !isExist {
 		os.MkdirAll(filepath.Join(homeTemplate, "hooks"), 0755)
-		installInto(homeTemplate, tplPreInstall)
+		installInto(homeTemplate, tplPostInstall)
 	}
 
 	gitExec(GIT["SetTemplateDir"] + homeTemplate)
