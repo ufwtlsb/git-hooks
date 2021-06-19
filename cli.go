@@ -395,11 +395,9 @@ func runHook(hook string, args ...string) (status int, err error) {
 		//fmt.Println("windowsCmd is", windowsCmd)
 		//Z:\work\worklog\202005\tmp\test-git-hook-1\githooks\pre-commit\test.sh replace，in git for windows
 		hook = strings.ReplaceAll(hook, "\\", "/")
-		cmdArgs := []string{"-c", "exec " + hook}
+		cmdArgs := []string{"-c", "exec " + hook + " " + strings.Join(args, " ")}
 		//fmt.Println("cmdArgs is", cmdArgs)
-		windowsArgs := append(cmdArgs, args...)
-		//fmt.Println("windowsArgs is", windowsArgs)
-		cmd = exec.Command(windowsCmd, windowsArgs...)
+		cmd = exec.Command(windowsCmd, cmdArgs...)
 	} else {
 		cmd = exec.Command(hook, args...)
 	}
